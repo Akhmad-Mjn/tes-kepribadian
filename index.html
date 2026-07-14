@@ -3,134 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tes Gaya Kerja & Belajar</title>
+    <title>Tes Kepribadian: Gaya Kerja & Belajar</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Nunito:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1 {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background-color: #46178f; /* Warna ungu khas Kahoot */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             text-align: center;
-            color: #2c3e50;
         }
-        .question {
-            margin-bottom: 20px;
-        }
-        .question p {
-            font-weight: bold;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-        button {
-            display: block;
+
+        #app-container {
             width: 100%;
-            padding: 10px;
-            background: #3498db;
-            color: #fff;
+            max-width: 800px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Layar Utama */
+        #start-screen, #result-screen {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-start {
+            background-color: #333333;
+            color: white;
             border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
             border-radius: 5px;
-            font-size: 16px;
             cursor: pointer;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-        #result {
             margin-top: 20px;
-            padding: 15px;
-            background: #e8f8f5;
-            border-left: 5px solid #1abc9c;
+            transition: transform 0.1s;
+        }
+
+        .btn-start:active {
+            transform: scale(0.95);
+        }
+
+        /* Layar Kuis */
+        #quiz-screen {
             display: none;
+            width: 100%;
+        }
+
+        .question-box {
+            background: white;
+            color: #333;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            /* Opsi ketiga membentang penuh jika ganjil */
+            .option-btn:nth-child(3) {
+                grid-column: span 2;
+            }
+        }
+
+        .option-btn {
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            transition: filter 0.2s, transform 0.1s;
+        }
+
+        .option-btn:hover { filter: brightness(1.1); }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 0 0; }
+
+        /* Warna Tombol bergaya Kahoot */
+        .color-red { background-color: #e21b3c; }
+        .color-blue { background-color: #1368ce; }
+        .color-yellow { background-color: #d89e00; }
+
+        /* Layar Hasil */
+        #result-img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Tes Tipe Analis & Eksekutor</h1>
-    <form id="quizForm">
-        
-        <div class="question">
-            <p>1. Saat menyusun atau meninjau pedoman/modul, apa fokus utama Anda?</p>
-            <label><input type="radio" name="q1" value="A" required> A. Memastikan data, angka, dan metodologi sangat akurat.</label>
-            <label><input type="radio" name="q1" value="B"> B. Memastikan bahasa mudah dipahami oleh audiens.</label>
-            <label><input type="radio" name="q1" value="C"> C. Mencari cara agar pedoman tersebut cepat bisa dipraktikkan di lapangan.</label>
+    <!-- Elemen Audio (Menggunakan sumber suara publik gratis untuk demo) -->
+    <audio id="sound-click" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sound-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <div id="app-container">
+        <!-- Layar Mulai -->
+        <div id="start-screen">
+            <h1>Tes Gaya Kerja & Analisis</h1>
+            <p>Jawab 10 pertanyaan ini untuk mengetahui apakah Anda seorang Analis, Komunikator, atau Eksekutor.</p>
+            <button class="btn-start" onclick="startQuiz()">Mulai Tes!</button>
         </div>
 
-        <div class="question">
-            <p>2. Saat bekerja dalam tim untuk mengevaluasi sebuah program, Anda cenderung...</p>
-            <label><input type="radio" name="q2" value="A"> A. Mengumpulkan matriks dan bukti objektif terlebih dahulu.</label>
-            <label><input type="radio" name="q2" value="B"> B. Mengajak tim berdiskusi untuk menyamakan persepsi.</label>
-            <label><input type="radio" name="q2" value="C"> C. Langsung membagi tugas dan membuat jadwal (timeline) eksekusi.</label>
+        <!-- Layar Kuis -->
+        <div id="quiz-screen">
+            <div class="progress" id="progress-text">Pertanyaan 1 / 10</div>
+            <div class="question-box" id="question-text">Memuat pertanyaan...</div>
+            <div class="options-grid">
+                <button class="option-btn color-red" onclick="selectAnswer('A')" id="opt1">Opsi A</button>
+                <button class="option-btn color-blue" onclick="selectAnswer('B')" id="opt2">Opsi B</button>
+                <button class="option-btn color-yellow" onclick="selectAnswer('C')" id="opt3">Opsi C</button>
+            </div>
         </div>
 
-        <div class="question">
-            <p>3. Jika menghadapi masalah birokrasi atau teknis yang mendadak, Anda akan:</p>
-            <label><input type="radio" name="q3" value="A"> A. Membaca ulang aturan atau standar operasional yang berlaku.</label>
-            <label><input type="radio" name="q3" value="B"> B. Berkonsultasi dengan rekan kerja atau pimpinan.</label>
-            <label><input type="radio" name="q3" value="C"> C. Mencari solusi sementara yang paling cepat menyelesaikan masalah.</label>
+        <!-- Layar Hasil -->
+        <div id="result-screen" style="display: none;">
+            <h1 id="result-title">Hasil Anda</h1>
+            <img id="result-img" src="" alt="Ilustrasi Hasil">
+            <p id="result-desc" style="font-size: 18px; line-height: 1.6;"></p>
+            <button class="btn-start" onclick="location.reload()">Main Lagi</button>
         </div>
-
-        <button type="button" onclick="calculateResult()">Lihat Hasil</button>
-    </form>
-
-    <div id="result">
-        <h3 id="resultTitle"></h3>
-        <p id="resultDesc"></p>
     </div>
-</div>
 
-<script>
-    function calculateResult() {
-        const form = document.getElementById('quizForm');
-        
-        // Memeriksa apakah semua pertanyaan sudah dijawab
-        if (!form.q1.value || !form.q2.value || !form.q3.value) {
-            alert("Harap jawab semua pertanyaan terlebih dahulu.");
-            return;
-        }
+    <script>
+        const questions = [
+            {
+                q: "1. Saat meninjau dokumen prosedur operasional standar (SOP) atau modul materi, apa yang pertama kali Anda perhatikan?",
+                a: "Akurasi data, metodologi, dan referensi aturan baku.",
+                b: "Gaya bahasa yang mudah dipahami oleh audiens atau peserta.",
+                c: "Daftar periksa (checklist) yang bisa langsung dieksekusi di lapangan."
+            },
+            {
+                q: "2. Dalam persiapan acara besar atau evaluasi program tahunan, Anda lebih suka bertugas sebagai...",
+                a: "Perumus indikator, pengelola anggaran, dan penyusun laporan matrik.",
+                b: "Koordinator yang memimpin rapat, melatih staf, dan menjalin komunikasi.",
+                c: "Seksi lapangan yang mengatur logistik, jadwal, dan penyelesaian masalah dadakan."
+            },
+            {
+                q: "3. Ketika ada rekan kerja atau mahasiswa yang tidak memahami instruksi, Anda akan:",
+                a: "Memberikan dokumen tertulis atau pedoman langkah demi langkah yang detail.",
+                b: "Mengajaknya berdiskusi secara langsung untuk menjelaskan konsepnya secara lisan.",
+                c: "Langsung mencontohkan cara mengerjakannya agar cepat selesai."
+            },
+            {
+                q: "4. Aplikasi atau alat bantu kerja mana yang paling sering Anda andalkan?",
+                a: "Spreadsheet (Excel/Sheets) untuk tabulasi dan analisis data.",
+                b: "Platform presentasi dan media komunikasi tim (Zoom/Grup Chat).",
+                c: "Aplikasi manajemen tugas atau sekadar catatan to-do list (checklist) harian."
+            },
+            {
+                q: "5. Bagaimana cara Anda merespons aturan atau regulasi baru dari pusat?",
+                a: "Mempelajari landasan hukumnya secara mendalam sebelum menerapkannya.",
+                b: "Mensosialisasikannya kepada tim untuk menyamakan persepsi bersama.",
+                c: "Langsung mencari celah praktis bagaimana aturan itu bisa dijalankan hari ini juga."
+            },
+            {
+                q: "6. Jika diberikan tugas untuk mengawasi standar kelayakan (misal: sanitasi atau mutu pangan), Anda fokus pada...",
+                a: "Mengisi instrumen penilaian sesuai dengan parameter dan bukti objektif (EVIDENCE).",
+                b: "Memberikan edukasi dan penyuluhan kepada pelaku usaha atau pihak terkait.",
+                c: "Memberikan instruksi perbaikan fisik secara langsung dan tegas di lokasi."
+            },
+            {
+                q: "7. Saat waktu tenggat (deadline) pelaporan sudah sangat dekat, reaksi Anda:",
+                a: "Tetap tenang, mengecek ulang akurasi angka agar tidak ada kesalahan fatal.",
+                b: "Membagi sisa tugas ke anggota tim agar beban terasa lebih ringan.",
+                c: "Memotong birokrasi yang tidak perlu dan segera mengirimkan hasil yang ada."
+            },
+            {
+                q: "8. Dalam merancang sebuah desain atau presentasi, apa prioritas Anda?",
+                a: "Struktur informasi yang sistematis dan detail yang akurat.",
+                b: "Visual yang menarik dan cerita yang memikat audiens.",
+                c: "Langsung ke inti pesan, tidak perlu banyak ornamen, yang penting informatif."
+            },
+            {
+                q: "9. Saat berhadapan dengan masalah matematika atau logika rasional, Anda merasa...",
+                a: "Tertantang dan menikmati proses memecahkan rumus selangkah demi selangkah.",
+                b: "Lebih suka membahasnya bersama orang lain untuk menemukan solusinya.",
+                c: "Hanya ingin tahu rumus cepatnya agar segera mendapatkan hasil akhir."
+            },
+            {
+                q: "10. Di akhir jam kerja yang sibuk, Anda merasa paling puas jika...",
+                a: "Semua laporan terarsip rapi dan data sinkron tanpa selisih.",
+                b: "Rapat berjalan lancar dan hubungan dengan tim terasa solid.",
+                c: "Semua daftar tugas hari itu berhasil dicoret (selesai secara fisik)."
+            }
+        ];
 
+        let currentQuestion = 0;
         let scores = { A: 0, B: 0, C: 0 };
-        
-        scores[form.q1.value]++;
-        scores[form.q2.value]++;
-        scores[form.q3.value]++;
 
-        let resultType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        const soundClick = document.getElementById('sound-click');
+        const soundWin = document.getElementById('sound-win');
 
-        let title = "";
-        let desc = "";
-
-        if (resultType === 'A') {
-            title = "Tipe Analitis & Terstruktur";
-            desc = "Anda sangat berorientasi pada data, fakta, dan metode. Anda unggul dalam menyusun dokumen, menganalisis statistik, dan memastikan semuanya berjalan sesuai standar operasi yang tepat.";
-        } else if (resultType === 'B') {
-            title = "Tipe Komunikator & Kolaborator";
-            desc = "Anda mengutamakan kerja sama dan pemahaman bersama. Anda sangat baik dalam mengajar, memfasilitasi diskusi, dan menjaga ritme kerja tim tetap harmonis.";
-        } else {
-            title = "Tipe Eksekutor Praktis";
-            desc = "Anda berorientasi pada tindakan dan hasil nyata di lapangan. Anda efisien, cepat mengambil keputusan, dan pandai mengubah teori menjadi praktik langsung.";
+        function playClick() {
+            soundClick.currentTime = 0;
+            soundClick.play().catch(e => console.log("Audio play diizinkan setelah interaksi pengguna"));
         }
 
-        document.getElementById('resultTitle').innerText = title;
-        document.getElementById('resultDesc').innerText = desc;
-        document.getElementById('result').style.display = 'block';
-    }
-</script>
+        function startQuiz() {
+            playClick();
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            loadQuestion();
+        }
 
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('progress-text').innerText = `Pertanyaan ${currentQuestion + 1} / 10`;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('opt1').innerText = q.a;
+            document.getElementById('opt2').innerText = q.b;
+            document.getElementById('opt3').innerText = q.c;
+        }
+
+        function selectAnswer(type) {
+            playClick();
+            scores[type]++;
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            
+            soundWin.currentTime = 0;
+            soundWin.play();
+
+            // Tentukan pemenang
+            let resultType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            
+            let titleText = "";
+            let descText = "";
+            let imgUrl = "";
+
+            if (resultType === 'A') {
+                titleText = "Tipe Analitis (The Thinker) 📊";
+                descText = "Anda adalah pemikir yang terstruktur, teliti, dan berorientasi pada data. Anda sangat unggul dalam mengevaluasi metrik, menyusun laporan yang akurat, serta memastikan semua prosedur berjalan sesuai landasan teori dan aturan yang baku. Kehadiran Anda memastikan tim tidak mengambil langkah yang salah secara administratif.";
+                imgUrl = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80"; // Gambar Data/Analisis
+            } else if (resultType === 'B') {
+                titleText = "Tipe Komunikator (The Collaborator) 🤝";
+                descText = "Anda adalah penggerak tim yang sangat baik dalam edukasi, koordinasi, dan mediasi. Fokus utama Anda adalah pada manusia dan pemahaman bersama. Anda ahli dalam menyampaikan materi yang rumit menjadi bahasa yang mudah dipahami, serta menjaga ritme kerja tim tetap harmonis di tengah tekanan.";
+                imgUrl = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80"; // Gambar Diskusi/Tim
+            } else {
+                titleText = "Tipe Eksekutor (The Doer) ⚡";
+                descText = "Anda berorientasi pada tindakan cepat dan hasil nyata di lapangan. Anda tidak suka birokrasi berbelit dan lebih memilih membuat daftar periksa (checklist) taktis untuk langsung diselesaikan. Anda efisien, praktis, dan sangat bisa diandalkan ketika proyek membutuhkan penyelesaian dalam waktu singkat.";
+                imgUrl = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"; // Gambar Eksekusi Lapangan
+            }
+
+            document.getElementById('result-title').innerText = titleText;
+            document.getElementById('result-desc').innerText = descText;
+            
+            const resImg = document.getElementById('result-img');
+            resImg.src = imgUrl;
+            resImg.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
